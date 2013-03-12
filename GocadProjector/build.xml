@@ -1,0 +1,144 @@
+<?xml version="1.0" ?>
+
+<project name="GOCAD Projector" basedir="." default="run">
+
+	<property name="launch4j_dir" value="${basedir}/launch4j" />
+	<!-- http://launch4j.sourceforge.net/docs.html -->
+	<taskdef name="launch4j" classname="net.sf.launch4j.ant.Launch4jTask" classpath="${launch4j_dir}/launch4j.jar:${launch4j_dir}/lib/xstream.jar" />
+
+	<property name="javac_debug" value="false" />
+
+	<property name="src_dir" value="${basedir}/src/main/java" />
+	<property name="resources_dir" value="${basedir}/src/main/resources" />
+
+	<property name="lib_dir" value="${basedir}/lib" />
+
+	<property name="gdal_dir" value="${basedir}/gdal" />
+	<property name="data_dir" value="${basedir}/gdal/data" />
+
+	<property name="target_dir" value="${basedir}/target" />
+	<property name="build_dir" value="${target_dir}/classes" />
+	<property name="package_dir" value="${target_dir}/package" />
+	<property name="jar_name" value="gocadprojector.jar" />
+
+	<property name="executable_dir" value="${target_dir}/executable" />
+	<property name="executable_jar_name" value="gocadprojector-all-in-one.jar" />
+	<property name="executable_gui_batch_name" value="gui.bat" />
+	<property name="executable_console_batch_name" value="console.bat" />
+	<property name="executable_gui_exe_name" value="gui.exe" />
+	<property name="executable_console_exe_name" value="console.exe" />
+
+	<path id="classpath">
+		<fileset dir="${lib_dir}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<patternset id="manifest_exclude">
+		<exclude name="META-INF/**" />
+	</patternset>
+
+	<target name="clean" description="Remove all generated files">
+		<delete dir="${target_dir}" />
+	</target>
+
+	<target name="build" description="Compile the application source code">
+		<mkdir dir="${build_dir}" />
+		<copy todir="${build_dir}">
+			<fileset dir="${resources_dir}" />
+		</copy>
+		<copy todir="${build_dir}">
+			<fileset dir="${src_dir}">
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>
+		<javac source="1.6" target="1.6" destdir="${build_dir}" classpathref="classpath" listfiles="no" fork="true" debug="${javac_debug}" includeantruntime="no">
+			<src path="${src_dir}" />
+		</javac>
+	</target>
+
+	<target name="package" depends="build" description="Create the GOCAD Projector JAR file">
+		<mkdir dir="${package_dir}" />
+		<jar destfile="${package_dir}/${jar_name}">
+			<manifest>
+				<attribute name="Main-Class" value="au.gov.ga.gocadprojector.application.GUI" />
+			</manifest>
+			<fileset dir="${build_dir}" />
+		</jar>
+	</target>
+
+	<target name="executable" depends="package" description="Create the executable distros">
+		<mkdir dir="${executable_dir}" />
+
+		<antcall target="-create-platform-executable">
+			<param name="platform" value="windows-x86" />
+		</antcall>
+		<antcall target="-create-platform-executable">
+			<param name="platform" value="windows-x64" />
+		</antcall>
+	</target>
+
+	<!-- Private - Should only be invoked from the 'executable' target -->
+	<target name="-create-platform-executable" description="Create a platform-specific executable distro named in the 'platform' param">
+		<property name="target_platform_dir" value="${executable_dir}/${platform}" />
+		<property name="gdal_platform_dir" value="${gdal_dir}/gdal-${platform}" />
+		<property name="lib_platform_dir" value="${lib_dir}/${platform}" />
+		<property name="plugins_platform_dir" value="${gdal_platform_dir}/plugins" />
+
+		<jar destfile="${target_platform_dir}/${executable_jar_name}">
+			<fileset dir="${build_dir}" />
+
+			<zipgroupfileset dir="${lib_dir}">
+				<include name="*.jar" />
+				<patternset refid="manifest_exclude" />
+			</zipgroupfileset>
+			<zipgroupfileset dir="${lib_platform_dir}">
+				<include name="**/*.jar" />
+				<patternset refid="manifest_exclude" />
+			</zipgroupfileset>
+			<zipgroupfileset dir="${gdal_platform_dir}">
+				<include name="**/*.jar" />
+				<patternset refid="manifest_exclude" />
+			</zipgroupfileset>
+
+			<manifest>
+				<attribute name="Main-Class" value="au.gov.ga.gocadprojector.application.GUI" />
+			</manifest>
+		</jar>
+
+		<!-- Copy the appropriate GDAL package -->
+		<copy todir="${target_platform_dir}/gdal">
+			<fileset dir="${gdal_platform_dir}">
+				<include name="**/*.dll" />
+			</fileset>
+		</copy>
+		<copy todir="${target_platform_dir}/gdal/data">
+			<fileset dir="${data_dir}" />
+		</copy>
+
+		<launch4j>
+			<config outfile="${target_platform_dir}/${executable_gui_exe_name}" jarPath="${executable_jar_name}" dontWrapJar="true" headerType="gui" errTitle="GOCAD Projector">
+				<jre minVersion="1.5.0" />
+				<var>PATH=gdal;%PATH%</var>
+			</config>
+		</launch4j>
+
+		<launch4j>
+			<config outfile="${target_platform_dir}/${executable_console_exe_name}" jarPath="${executable_jar_name}" dontWrapJar="true" headerType="console" errTitle="GOCAD Projector">
+				<jre minVersion="1.5.0" />
+				<classPath mainClass="au.gov.ga.gocadprojector.application.Console">
+					<cp>${executable_jar_name}</cp>
+				</classPath>
+				<var>PATH=gdal;%PATH%</var>
+			</config>
+		</launch4j>
+
+		<!-- Create the bat scripts -->
+		<echo file="${target_platform_dir}/${executable_gui_batch_name}">@echo off ${line.separator}SET PATH=.\gdal;%PATH% ${line.separator}java -Xmx1024m -cp ${executable_jar_name} -Djava.library.path=gdal au.gov.ga.gocadprojector.application.GUI %*</echo>
+		<echo file="${target_platform_dir}/${executable_console_batch_name}">@echo off ${line.separator}SET PATH=.\gdal;%PATH% ${line.separator}java -Xmx1024m -cp ${executable_jar_name} -Djava.library.path=gdal au.gov.ga.gocadprojector.application.Console %*</echo>
+
+	</target>
+
+	<target name="run" depends="executable" />
+
+</project>
