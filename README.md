@@ -5,8 +5,9 @@ This project contains a simple Java utility that can be used to reproject GOCAD 
 different map projections. It uses the GDAL library for reprojection.
 
 It has good support for Atomic, TSurf, PLine, TSolid, and Well objects (anything that uses VRTX
-or PVRTX). It also has limited support for Voxet, GSurf, and SGrid objects, but only changes the
-coordinate system and not individual points.
+or PVRTX), as well as SGrid objects. It also has limited support for Voxet and GSurf objects, but
+only changes the coordinate system and not individual points (which would require resampling of
+the attached binary data).
 
 ## Download ##
 Compiled versions are available for download from the following links:
