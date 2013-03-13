@@ -8,6 +8,11 @@ It has good support for Atomic, TSurf, PLine, TSolid, and Well objects (anything
 or PVRTX). It also has limited support for Voxet, GSurf, and SGrid objects, but only changes the
 coordinate system and not individual points.
 
+## Download ##
+Compiled versions are available for download from the following links:
+* [Windows x86](http://sourceforge.net/projects/gocad-projector/files/gocad-projector-windows-x86.zip/download)
+* [Windows x64](http://sourceforge.net/projects/gocad-projector/files/gocad-projector-windows-x64.zip/download)
+
 ## Usage ##
 There are two different executable classes in the utility; a GUI version and a Console version.
 
