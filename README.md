@@ -43,6 +43,10 @@ options are as follows:
                          above), or the name of a .prf file containing well known
                          text.
 
+## Supported platforms ##
+Any architecture/operating system with compiled GDAL binaries and a JVM should be supported. However
+this repository only contains the Windows (x86 and x64) GDAL binaries.
+
 ## License ##
 This project is released under the [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0.html)
 and is distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
