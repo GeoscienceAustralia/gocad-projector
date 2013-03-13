@@ -55,4 +55,4 @@ CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and limitations under the License.
 
 ## Contact ##
-For more information on the `EarthSci RCP` project, please email *m3dv:at:ga.gov.au*.
+For more information on this project, please email *m3dv:at:ga.gov.au*.
