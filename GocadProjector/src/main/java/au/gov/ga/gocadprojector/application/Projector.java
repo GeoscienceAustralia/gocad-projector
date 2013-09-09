@@ -51,6 +51,8 @@ public class Projector
 	private final static Pattern GOCAD_TYPE_REGEX = Pattern.compile("(?i)GOCAD\\s+(\\w+).*");
 	private final static Pattern VERTEX_REGEX = Pattern
 			.compile("(?i)P?VRTX\\s+\\d+\\s+([\\d.\\-e]+)\\s+([\\d.\\-e]+)\\s+([\\d.\\-e]+).*");
+	private final static Pattern WREF_REGEX = Pattern
+			.compile("(?i)WREF\\s+([\\d.\\-e]+)\\s+([\\d.\\-e]+)\\s+([\\d.\\-e]+).*");
 	private final static Pattern AXIS_REGEX = Pattern
 			.compile("(?i)(?:AXIS_(\\w+)|(O)RIGIN)\\s+([\\d.\\-e]+)\\s+([\\d.\\-e]+)\\s+([\\d.\\-e]+).*");
 	private final static Pattern NAME_REGEX = Pattern.compile("(?i)name:(.*)");
@@ -208,8 +210,10 @@ public class Projector
 	protected void handleSimpleLine(String line, int lineNumber, Writer writer, CoordinateTransformation transformation)
 			throws IOException
 	{
-		Matcher matcher = VERTEX_REGEX.matcher(line);
-		if (matcher.matches())
+		Matcher vertexMatcher = VERTEX_REGEX.matcher(line);
+		Matcher wrefMatcher = WREF_REGEX.matcher(line);
+		Matcher matcher = vertexMatcher.matches() ? vertexMatcher : wrefMatcher.matches() ? wrefMatcher : null;
+		if (matcher != null)
 		{
 			try
 			{
