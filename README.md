@@ -1,5 +1,3 @@
-## Geoscience Australia ##
-
 # GOCAD Projector #
 This project contains a simple Java utility that can be used to reproject GOCAD objects between
 different map projections. It uses the GDAL library for reprojection.
@@ -60,5 +58,5 @@ CONDITIONS OF ANY KIND, either express or implied.
 
 See the License for the specific language governing permissions and limitations under the License.
 
-## Contact ##
-For more information on this project, please email *m3dv:at:ga.gov.au*.
+## Contacts ##
+For more information on this project, please email <clientservices@ga.gov.au>.
